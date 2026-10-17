@@ -1,0 +1,2 @@
+export const ETIQUETA_TIPO = { PRODUCTO: 'Producto', SERVICIO: 'Servicio', ALQUILER: 'Alquiler', COMBO: 'Combo' };
+export const formatoPrecio = new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }); 

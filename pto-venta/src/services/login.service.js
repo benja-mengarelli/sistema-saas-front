@@ -3,7 +3,7 @@ import {
     signInWithEmailAndPassword
 } from "firebase/auth";
 import { setDoc, doc } from "firebase/firestore";
-import { auth, db } from "../services/firebase";
+import { auth, db } from "../firebase/firebase.config";
 
 export const login = (email, pass) => {
     return signInWithEmailAndPassword(auth, email, pass);

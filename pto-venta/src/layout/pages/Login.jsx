@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { login, register } from "../../services/auth.service";
+import { login, register } from "../../services/login.service.js";
 
 
 
-export default function LoginPopUp() {
+export default function LoginPage() {
     const [modoRegistro, setModoRegistro] = useState(false);
     const [nombre, setNombre] = useState("");
     const [email, setEmail] = useState("");

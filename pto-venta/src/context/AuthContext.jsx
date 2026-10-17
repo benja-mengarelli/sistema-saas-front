@@ -20,27 +20,19 @@ export const AuthProvider = ({ children }) => {
                     setUser(user);
                     setCargando(true);
 
-                    const docRef = doc(db, "users", user.uid);
-                    const docSnap = await getDoc(docRef);
+                    //Lecturas en paralelo para establecer el user y su/s empresa/s
+                    const [docSnap, empresasSnap] = await Promise.all([
+                        getDoc(doc(db, "users", user.uid)),
+                        getDocs(collection(db, "users", user.uid, "empresas")),
+                    ]);
+
+                    // Datos del usuario (nombre, uid, etc)
                     setDatos(docSnap.exists() ? docSnap.data() : null);
 
                     // A qué empresas pertenece
-                    const empresasSnap = await getDocs(collection(db, "users", user.uid, "empresas"));
                     const listaEmpresas = empresasSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
                     setEmpresas(listaEmpresas);
 
-                    // Resolvemos la empresa activa EN LA MISMA PASADA (no en un
-                    // efecto separado), para que cargando no baje a false hasta
-                    // que rolActual/empresaActivaId también estén listos.
-                    if (listaEmpresas.length === 0) {
-                        setEmpresaActivaId(null);
-                    } else if (listaEmpresas.length === 1) {
-                        setEmpresaActivaId(listaEmpresas[0].id);
-                    } else {
-                        const guardada = localStorage.getItem(`empresaActiva:${user.uid}`);
-                        const sigueSiendoValida = listaEmpresas.some((e) => e.id === guardada);
-                        setEmpresaActivaId(sigueSiendoValida ? guardada : null);
-                    }
                 } else {
                     setUser(null);
                     setDatos(null);
@@ -69,12 +61,6 @@ export const AuthProvider = ({ children }) => {
     const empresaActiva = empresas.find((e) => e.id === empresaActivaId) || null;
 
     const logout = () => signOut(auth);
-
-    // Ejemplo de uso en el router/pantalla principal:
-    //-   cargando                               -> loading/skeleton
-    //-   !cargando && empresas.length === 0     -> pantalla "ingresar código"
-    //-   !cargando && empresaActivaId === null  -> pantalla "elegí tu empresa" (solo pasa con 2+)
-    //-   !cargando && empresaActivaId !== null  -> app normal, Navbar según rolActual
 
     return (
         <AuthContext.Provider
