@@ -429,3 +429,41 @@ body {
 
 .form__campos { display: grid; gap: 14px; min-width: 0; margin: 0; padding: 0; border: 0; }
 .form__campos:disabled { opacity: .7; cursor: progress; }
+
+
+/*! PAGINA CONTEOSTOCK  */
+.conteo-input {
+    width: 110px; padding: 8px 10px; border: 1px solid var(--borde); border-radius: 8px;
+    background: var(--bg); color: var(--texto); font: inherit; text-align: right;
+}
+.conteo-input:focus-visible { outline: 2px solid var(--acento); outline-offset: 1px; }
+.conteo-input[aria-invalid="true"] { border-color: #dc2626; }
+
+.dif--mas { color: #15803d; font-weight: 600; }
+.dif--menos { color: #dc2626; font-weight: 600; }
+.dif--cero, .dif--vacio { color: var(--suave); }
+@media (prefers-color-scheme: dark) { .dif--mas { color: #4ade80; } }
+
+.exito-msg { color: #15803d; padding: 4px 0; }
+.barra-guardado {
+    position: sticky; bottom: 0; display: flex; justify-content: space-between; align-items: center;
+    gap: 12px; flex-wrap: wrap; padding: 14px 16px;
+    border: 1px solid var(--borde); border-radius: 12px; background: var(--card);
+}
+.barra-guardado .form__acciones { margin-top: 0; }
+
+
+/*pagina ver stock  */
+.fila-click { cursor: pointer; }
+.fila-click:hover td { background: var(--bg); }
+.fila-click:focus-visible { outline: 2px solid var(--acento); outline-offset: -2px; }
+.modal--ancho { max-width: 760px; }
+
+
+/*! COMPRAS + FORM COMPRAS  */
+.linea-compra { display: grid; grid-template-columns: 1fr 90px 110px 100px auto; align-items: center; gap: 10px; }
+@media (max-width: 560px) {
+    .linea-compra { grid-template-columns: 1fr 1fr; }
+    .linea-compra > :first-child { grid-column: 1 / -1; }
+}
+.tabla tfoot td { border-top: 1px solid var(--borde); border-bottom: none; }

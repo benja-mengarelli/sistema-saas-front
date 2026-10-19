@@ -14,7 +14,7 @@ const ACCIONES = [
     { id: 'combo', label: 'Crear combo', icono: '🎁' },
     { id: 'servicio', label: 'Agregar servicio', icono: '🛎️' },
     { id: 'eliminar', label: 'Eliminar producto', icono: '🗑️', peligro: true },
-    { id: 'conteo', label: 'Conteo de stock', icono: '📋', bloqueado: true },
+    { id: 'conteo', label: 'Conteo de stock', icono: '📋', path: "/productos/conteo"},
 ];
 
 export default function ProductosPage() {
@@ -64,7 +64,7 @@ export default function ProductosPage() {
                         icono={a.icono}
                         label={a.label}
                         peligro={a.peligro}
-                        onClick={() => setAccion(a.id)}
+                        onClick={() => (a.path ? navigate(a.path) : setAccion(a.id))}
                     />
                 ))}
             </section>
