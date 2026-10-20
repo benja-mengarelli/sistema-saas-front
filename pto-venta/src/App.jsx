@@ -7,7 +7,8 @@ import DashboardPage from './layout/pages/DashboardPage.jsx';
 import ProductosPage from './layout/pages/ProductosPage';
 import ConteoStockPage from "./layout/pages/ConteoStockPage.jsx"
 import MovimientosStockPage from './layout/pages/MovimientoStockPage.jsx';
-/* import ComprasPage from "./layout/pages/ComprasPage" */
+import ComprasPage from "./layout/pages/ComprasPage"
+import PuntoVentaPage from "./layout/pages/PuntoVentaPage"
 
 function App() {
     return (
@@ -27,7 +28,8 @@ function App() {
                         <Route path="/productos" element={<ProductosPage />} />
                         <Route path="/productos/conteo" element={<ConteoStockPage />} />
                         <Route path="/movimientos-stock" element={<MovimientosStockPage />} />
-                        {/* <Route path="/compras" element={<ComprasPage />} /> */}
+                        <Route path="/compras" element={<ComprasPage />} />
+                        <Route path="/punto-venta" element={<PuntoVentaPage />} />
                     </Route>
 
                     <Route path="*" element={<Navigate to="/dashboard" replace />} />

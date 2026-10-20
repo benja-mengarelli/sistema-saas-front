@@ -14,7 +14,7 @@ const ACCIONES = [
     { id: 'combo', label: 'Crear combo', icono: '🎁' },
     { id: 'servicio', label: 'Agregar servicio', icono: '🛎️' },
     { id: 'eliminar', label: 'Eliminar producto', icono: '🗑️', peligro: true },
-    { id: 'conteo', label: 'Conteo de stock', icono: '📋', path: "/productos/conteo"},
+    { id: 'conteo', label: 'Conteo de stock', icono: '📋', path: "/productos/conteo" },
 ];
 
 export default function ProductosPage() {
@@ -22,21 +22,28 @@ export default function ProductosPage() {
     const navigate = useNavigate();
     const { productos, cargando, error, recargar } = useProductos();
     const [busqueda, setBusqueda] = useState('');
+    const [categoria, setCategoria] = useState('Todos');
 
     const [accion, setAccion] = useState(null); // 'producto' | 'servicio' | 'combo' | 'eliminar' | null
     const [ocupado, setOcupado] = useState(false);
     const cerrar = () => { setOcupado(false); setAccion(null); };
     const alGuardar = () => { cerrar(); recargar(); };
 
-    const categorias = useMemo(
-        () => [...new Set(productos.map((p) => p.categoria).filter(Boolean))].sort(),
-        [productos]
-    );
+    const categorias = useMemo(() => {
+        const set = new Set(productos.map((p) => p.categoria || SIN_CATEGORIA));
+        return ['Todos', ...[...set].sort((a, b) => a.localeCompare(b))];
+    }, [productos]);
 
-    const filtrados = useMemo(() => {
+    const activa = categorias.includes(categoria) ? categoria : 'Todos';
+
+    const visibles = useMemo(() => {
         const t = busqueda.trim().toLowerCase();
-        return t ? productos.filter((p) => p.nombre.toLowerCase().includes(t)) : productos;
-    }, [productos, busqueda]);
+        return productos.filter(
+            (p) =>
+                (activa === 'Todos' || (p.categoria || SIN_CATEGORIA) === activa) &&
+                (!t || p.nombre.toLowerCase().includes(t))
+        );
+    }, [productos, activa, busqueda]);
 
     return (
         <div className="pantalla">
@@ -70,13 +77,23 @@ export default function ProductosPage() {
             </section>
 
             <section className="productos__lista">
+                <div className="cat-boxes">
+                    {categorias.map((c) => (
+                        <button
+                            key={c} type="button"
+                            className={`cat-box${c === activa ? ' cat-box--activa' : ''}`}
+                            onClick={() => setCategoria(c)}
+                        >
+                            {c}
+                        </button>
+                    ))}
+                </div>
+
                 <input
-                    type="search"
-                    className="buscador"
-                    placeholder="Buscar producto…"
-                    value={busqueda}
-                    onChange={(e) => setBusqueda(e.target.value)}
+                    type="search" className="buscador" placeholder="Buscar producto…"
+                    value={busqueda} onChange={(e) => setBusqueda(e.target.value)}
                 />
+
 
                 {cargando && <p className="vacio">Cargando productos…</p>}
 
@@ -91,11 +108,11 @@ export default function ProductosPage() {
                     <p className="vacio">Todavía no cargaste productos.</p>
                 )}
 
-                {!cargando && !error && productos.length > 0 && filtrados.length === 0 && (
+                {!cargando && !error && productos.length > 0 && visibles.length === 0 && (
                     <p className="vacio">No hay productos que coincidan con la búsqueda.</p>
                 )}
 
-                {!cargando && !error && filtrados.length > 0 && (
+                {!cargando && !error && visibles.length > 0 && (
                     <div className="tabla-contenedor">
                         <table className="tabla">
                             <thead>
@@ -108,7 +125,7 @@ export default function ProductosPage() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {filtrados.map((p) => {
+                                {visibles.map((p) => {
                                     const stockBajo = p.stockeable && p.avisarStockMinimo && p.stock <= p.stockMinimo;
                                     return (
                                         <tr key={p._id}>

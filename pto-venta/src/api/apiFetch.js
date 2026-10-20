@@ -1,7 +1,7 @@
 import { auth } from '../firebase/firebase.config';
 import { API_URL } from '../config/api_config';
 
-export async function apiFetch(ruta, { method = 'GET', body, timeoutMs = 30000 } = {}) {
+export async function apiFetch(ruta, { method = 'GET', body, timeoutMs = 30000, idempotente = false } = {}) {
     const user = auth.currentUser;
     if (!user) throw new Error('Sesión no iniciada');
 
@@ -27,7 +27,7 @@ export async function apiFetch(ruta, { method = 'GET', body, timeoutMs = 30000 }
         return data;
     } catch (e) {
         if (e.name === 'AbortError') {
-            const aviso = method === 'GET'
+            const aviso = method === 'GET' || idempotente
                 ? ''
                 : ' Antes de reintentar, revisá el listado: puede que se haya guardado igual.';
             throw Object.assign(
