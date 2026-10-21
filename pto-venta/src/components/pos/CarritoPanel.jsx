@@ -2,7 +2,7 @@ import { formatoPrecio } from '../../utils/formato';
 
 export default function CarritoPanel({
     lineas, total, hayCaja, disponible,
-    onSumar, onRestar, onQuitar, onVaciar, onCobrar, onCerrarPanel, onAgregarCC
+    onSumar, onRestar, onQuitar, onVaciar, onCobrar, onCerrarPanel, onAgregarCC, onVerVentas
 }) {
     return (
         <div className="carrito">
@@ -57,6 +57,9 @@ export default function CarritoPanel({
                     Agregar a CC
                 </button>
                 <button type="button" className="btn-sec" onClick={onVaciar} disabled={lineas.length === 0}>Vaciar carrito</button>
+                <button type="button" className="btn-sec carrito__ventas" onClick={onVerVentas} disabled={!hayCaja}>
+                    Ver ventas de la caja
+                </button>
             </div>
         </div>
     );

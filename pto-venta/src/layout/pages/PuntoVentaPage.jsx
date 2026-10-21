@@ -15,6 +15,7 @@ import AgregarACCForm from '../../components/pos/AgregarACCForm';
 import CuentasCorrientes from '../../components/pos/CuentasCorrientes';
 import Modal from '../../components/Modal';
 import PantallaCarga from '../PantallaCarga';
+import VentasCaja from '../../components/pos/VentaCaja';
 
 export default function PuntoVentaPage() {
     const { empresaActiva, empresaActivaId } = useAuth();
@@ -31,6 +32,8 @@ export default function PuntoVentaPage() {
     const [cobrando, setCobrando] = useState(false);
     const [agregandoCC, setAgregandoCC] = useState(false);
     const [ocupado, setOcupado] = useState(false);
+    const [verVentas, setVerVentas] = useState(false);
+
     const claveRef = useRef(null);   // cobro: se conserva hasta que la venta se concreta
     const claveCCRef = useRef(null); // agregar a CC: ídem
 
@@ -121,6 +124,7 @@ export default function PuntoVentaPage() {
                                 onCobrar={abrirCobro}
                                 onAgregarCC={abrirAgregarCC}
                                 onCerrarPanel={() => setPanelAbierto(false)}
+                                onVerVentas={() => setVerVentas(true)}
                             />
                         </aside>
                     </div>
@@ -165,6 +169,14 @@ export default function PuntoVentaPage() {
                         onCancelar={cerrarAgregarCC}
                         onOcupado={setOcupado}
                     />
+                </Modal>
+            )}
+            {verVentas && (
+                <Modal
+                    titulo="Ventas de la caja" ancho cerrable={!ocupado}
+                    onCerrar={() => { setOcupado(false); setVerVentas(false); }}
+                >
+                    <VentasCaja onOcupado={setOcupado} onCambio={() => { recargarCaja(); recargarProductos(); }} />
                 </Modal>
             )}
         </div>

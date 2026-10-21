@@ -4,21 +4,12 @@ import { login, register } from "../../services/login.service.js";
 
 
 export default function LoginPage() {
-    const [modoRegistro, setModoRegistro] = useState(false);
-    const [nombre, setNombre] = useState("");
+    /* const [modoRegistro, setModoRegistro] = useState(false);
+    const [nombre, setNombre] = useState(""); */
     const [email, setEmail] = useState("");
     const [pass, setPass] = useState("");
     const [error, setError] = useState(null);
-    const [imagen, setImagen] = useState("/img/usuario.png")
-    const [cargandoAuth, setCargandoAuth] = useState(false);
-
-    const options = [
-    { id: "b", src: "/img/usuario.png", label: "Opción B" },
-    { id: "a", src: "/img/adm-v2.png", label: "Opción A" },
-    { id: "c", src: "/img/usuario2.png", label: "Opción C" },
-    { id: "d", src: "/img/usuario3.png", label: "Opción D" },
-    { id: "e", src: "/img/usuario4.png", label: "Opción E" }
-];
+    const [cargandoAuth, setCargandoAuth] = useState("false")
 
     const hacerLogin = async () => {
         try {
@@ -32,7 +23,7 @@ export default function LoginPage() {
         }
     };
 
-    const hacerRegistro = async () => {
+/*     const hacerRegistro = async () => {
         try {
             setCargandoAuth(true);
             await register(nombre, email, pass, imagen);
@@ -42,21 +33,22 @@ export default function LoginPage() {
         } finally {
             setCargandoAuth(false);
         }
-    };
+    }; */
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        modoRegistro ? hacerRegistro() : hacerLogin();
+        hacerLogin();
     };
+    /* modoRegistro ? hacerRegistro() : */ 
 
 
     return (
         <div className="modal-fondo">
             <div className="modal-caja">
-                <h2>{modoRegistro ? "Registrarse" : "Iniciar Sesión"}</h2>
+                <h2>Iniciar Sesión</h2> {/* modoRegistro ? "Registrarse" :  */}
 
                 <form onSubmit={handleSubmit}>
-                    {modoRegistro && (
+                    {/* {modoRegistro && (
                         <input
                             type="text"
                             placeholder="Nombre"
@@ -64,7 +56,7 @@ export default function LoginPage() {
                             onChange={(e) => setNombre(e.target.value)}
                             required minLength={1} maxLength={8}
                         />
-                    )}
+                    )} */}
                     <input
                         type="email"
                         placeholder="Email"
@@ -80,7 +72,7 @@ export default function LoginPage() {
                         onChange={(e) => setPass(e.target.value)}
                         required minLength={6} maxLength={12}
                     />
-                    {modoRegistro && (
+                    {/* {modoRegistro && (
                         <div className="imagen-login">
                         {options.map((opt) => (
                             <button
@@ -93,21 +85,22 @@ export default function LoginPage() {
                             </button>
                         ))}
                     </div>
-                    )}
+                    )} */}
                     
 
                     {error && <p className="error">{error}</p>}
 
                     <button type="submit" className="btn-login">
-                        {modoRegistro ? "Crear cuenta" : "Entrar"}
+                        Entrar
+                        {/* {modoRegistro ? "Crear cuenta" : "Entrar"} */}
                     </button>
                 </form>
 
-                <p className="link" onClick={() => setModoRegistro(!modoRegistro)}>
+                {/* <p className="link" onClick={() => setModoRegistro(!modoRegistro)}>
                     {modoRegistro
                         ? "¿Ya tenés cuenta? Iniciar sesión"
                         : "¿No tenés cuenta? Registrate acá"}
-                </p>
+                </p> */}
             </div>
         </div>
     );

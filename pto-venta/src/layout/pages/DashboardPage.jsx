@@ -9,6 +9,7 @@ export default function DashboardPage() {
 
     const nombre = datos?.nombre || user?.displayName || user?.email;
 
+
     // Cuando exista el rol del operador:
     // const bloqueado = (box) => !box.roles.includes(rolOperador);
     const bloqueado = () => false;

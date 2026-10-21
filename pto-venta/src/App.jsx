@@ -9,6 +9,7 @@ import ConteoStockPage from "./layout/pages/ConteoStockPage.jsx"
 import MovimientosStockPage from './layout/pages/MovimientoStockPage.jsx';
 import ComprasPage from "./layout/pages/ComprasPage"
 import PuntoVentaPage from "./layout/pages/PuntoVentaPage"
+import CajasPage from "./layout/pages/CajasPage.jsx"
 
 function App() {
     return (
@@ -30,6 +31,7 @@ function App() {
                         <Route path="/movimientos-stock" element={<MovimientosStockPage />} />
                         <Route path="/compras" element={<ComprasPage />} />
                         <Route path="/punto-venta" element={<PuntoVentaPage />} />
+                        <Route path="/cajas" element={<CajasPage />} />
                     </Route>
 
                     <Route path="*" element={<Navigate to="/dashboard" replace />} />

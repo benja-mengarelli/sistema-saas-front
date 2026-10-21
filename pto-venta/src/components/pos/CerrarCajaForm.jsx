@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { cerrarCaja } from '../../api/posApi';
 import { formatoPrecio } from '../../utils/formato';
+import { agruparFacturacion } from '../../utils/facturacion';
 
 const Fila = ({ etiqueta, valor, total = false }) => (
     <div className={`resumen-fila${total ? ' resumen-fila--total' : ''}`}>
@@ -13,26 +14,31 @@ const Fila = ({ etiqueta, valor, total = false }) => (
 const textoDiferencia = (d) => (d > 0 ? 'Sobrante' : d < 0 ? 'Faltante' : 'Sin diferencia');
 const claseDiferencia = (d) => (d > 0 ? 'dif--mas' : d < 0 ? 'dif--menos' : 'dif--cero');
 
+const num = (v) => (v === '' ? 0 : Number(v));
+const valido = (v) => v === '' || (Number.isFinite(Number(v)) && Number(v) >= 0);
+const r2 = (n) => Math.round(n * 100) / 100;
+
 export default function CerrarCajaForm({ resumen, onCerrada, onTerminar, onCancelar, onOcupado }) {
     const { empresaActivaId } = useAuth();
-    const [contado, setContado] = useState('');
+    const [saldo, setSaldo] = useState('');
+    const [retirado, setRetirado] = useState('');
     const [error, setError] = useState(null);
     const [guardando, setGuardando] = useState(false);
     const [resultado, setResultado] = useState(null);
 
-    // Resultado final: no depende de las props, que cambian cuando se recarga la caja
+    // Resultado final: sale de la caja devuelta, no de las props (cambian cuando se recarga la caja)
     if (resultado) {
-        const { efectivo } = resultado.resumen;
-        const dif = resultado.caja.efectivo.diferencia;
+        const ef = resultado.caja.efectivo;
         return (
             <div className="form">
                 <p>Caja cerrada.</p>
                 <div className="resumen">
-                    <Fila etiqueta="Debe haber" valor={efectivo.esperado} />
-                    <Fila etiqueta="Efectivo contado" valor={resultado.caja.efectivo.final} />
+                    <Fila etiqueta="Debe quedar en caja" valor={ef.esperado} />
+                    <Fila etiqueta="Saldo en caja" valor={ef.final} />
+                    <Fila etiqueta="Retirado" valor={ef.retirado} />
                     <div className="resumen-fila resumen-fila--total">
-                        <span>{textoDiferencia(dif)}</span>
-                        <span className={claseDiferencia(dif)}>{formatoPrecio.format(dif)}</span>
+                        <span>{textoDiferencia(ef.diferencia)}</span>
+                        <span className={claseDiferencia(ef.diferencia)}>{formatoPrecio.format(ef.diferencia)}</span>
                     </div>
                 </div>
                 <div className="form__acciones">
@@ -45,19 +51,25 @@ export default function CerrarCajaForm({ resumen, onCerrada, onTerminar, onCance
     if (!resumen) return <p className="vacio">No hay una caja abierta.</p>;
 
     const { facturacion, pagos, efectivo } = resumen;
-    const hayContado = contado !== '' && Number.isFinite(Number(contado)) && Number(contado) >= 0;
-    const diferencia = hayContado ? Math.round((Number(contado) - efectivo.esperado) * 100) / 100 : null;
+    const vendido = agruparFacturacion(facturacion);
+
+    const listo = saldo !== '' && valido(saldo) && valido(retirado);
+    const contado = listo ? r2(num(saldo) + num(retirado)) : null;
+    const diferencia = listo ? r2(contado - efectivo.esperado) : null;
 
     const enviar = async (e) => {
         e.preventDefault();
         if (guardando) return;
         setError(null);
-        if (!hayContado) return setError('Ingresá el efectivo contado');
+        if (!listo) return setError('Ingresá el saldo que queda en caja (y el retirado, si hubo)');
 
         setGuardando(true);
         onOcupado?.(true);
         try {
-            const r = await cerrarCaja(empresaActivaId, Number(contado));
+            const r = await cerrarCaja(empresaActivaId, {
+                efectivoEnCaja: num(saldo),
+                efectivoRetirado: num(retirado),
+            });
             setResultado(r);
             onOcupado?.(false);
             onCerrada(); // el padre recarga el estado de la caja
@@ -72,11 +84,10 @@ export default function CerrarCajaForm({ resumen, onCerrada, onTerminar, onCance
         <form className="form" onSubmit={enviar}>
             <fieldset className="form__campos" disabled={guardando}>
                 <div className="resumen">
-                    <h3 className="resumen__titulo">Facturación</h3>
-                    <Fila etiqueta="Productos" valor={facturacion.productos} />
-                    <Fila etiqueta="Servicios" valor={facturacion.servicios} />
-                    {facturacion.alquileres > 0 && <Fila etiqueta="Alquileres" valor={facturacion.alquileres} />}
-                    <Fila etiqueta="Total" valor={facturacion.total} total />
+                    <h3 className="resumen__titulo">Vendido</h3>
+                    <Fila etiqueta="Productos (incluye servicio de mesa)" valor={vendido.productos} />
+                    <Fila etiqueta="Alquileres" valor={vendido.alquileres} />
+                    <Fila etiqueta="Total" valor={vendido.total} total />
                 </div>
 
                 <div className="resumen">
@@ -98,22 +109,31 @@ export default function CerrarCajaForm({ resumen, onCerrada, onTerminar, onCance
                 </div>
 
                 <div className="campo">
-                    <label htmlFor="cc-contado">Efectivo contado</label>
-                    <input id="cc-contado" type="number" min="0" step="any" inputMode="decimal" value={contado} onChange={(e) => setContado(e.target.value)} autoFocus />
+                    <label htmlFor="cc-saldo">Saldo en caja (efectivo que queda)</label>
+                    <input id="cc-saldo" type="number" min="0" step="any" inputMode="decimal"
+                        value={saldo} onChange={(e) => setSaldo(e.target.value)} autoFocus />
+                </div>
+                <div className="campo">
+                    <label htmlFor="cc-retirado">Efectivo retirado</label>
+                    <input id="cc-retirado" type="number" min="0" step="any" inputMode="decimal"
+                        value={retirado} onChange={(e) => setRetirado(e.target.value)} />
                 </div>
 
-                {diferencia !== null && (
-                    <div className="resumen-fila resumen-fila--total">
-                        <span>{textoDiferencia(diferencia)}</span>
-                        <span className={claseDiferencia(diferencia)}>{formatoPrecio.format(diferencia)}</span>
-                    </div>
+                {listo && (
+                    <>
+                        <Fila etiqueta="Efectivo contado (saldo + retirado)" valor={contado} />
+                        <div className="resumen-fila resumen-fila--total">
+                            <span>{textoDiferencia(diferencia)}</span>
+                            <span className={claseDiferencia(diferencia)}>{formatoPrecio.format(diferencia)}</span>
+                        </div>
+                    </>
                 )}
 
                 {error && <p className="error-msg">{error}</p>}
 
                 <div className="form__acciones">
                     <button type="button" className="btn-sec" onClick={onCancelar}>Cancelar</button>
-                    <button type="submit" className="btn-peligro" disabled={!hayContado || guardando}>
+                    <button type="submit" className="btn-peligro" disabled={!listo || guardando}>
                         {guardando ? <><span className="spinner" aria-hidden="true" />Cerrando…</> : 'Cerrar caja'}
                     </button>
                 </div>

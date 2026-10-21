@@ -12,7 +12,7 @@ import { ETIQUETA_TIPO, formatoPrecio } from '../../utils/formato';
 const ACCIONES = [
     { id: 'producto', label: 'Agregar producto', icono: '➕' },
     { id: 'combo', label: 'Crear combo', icono: '🎁' },
-    { id: 'servicio', label: 'Agregar servicio', icono: '🛎️' },
+    { id: 'alquiler', label: 'Agregar alquiler', icono: '🛎️' },
     { id: 'eliminar', label: 'Eliminar producto', icono: '🗑️', peligro: true },
     { id: 'conteo', label: 'Conteo de stock', icono: '📋', path: "/productos/conteo" },
 ];
@@ -156,9 +156,9 @@ export default function ProductosPage() {
                     <ProductoForm tipo="PRODUCTO" categorias={categorias} onGuardado={alGuardar} onCancelar={cerrar} onOcupado={setOcupado} />
                 </Modal>
             )}
-            {accion === 'servicio' && (
-                <Modal titulo="Agregar servicio" onCerrar={cerrar} cerrable={!ocupado}>
-                    <ProductoForm tipo="SERVICIO" categorias={categorias} onGuardado={alGuardar} onCancelar={cerrar} onOcupado={setOcupado} />
+            {accion === 'alquiler' && (
+                <Modal titulo="Agregar alquiler" onCerrar={cerrar} cerrable={!ocupado}>
+                    <ProductoForm tipo="ALQUILER" categorias={categorias} onGuardado={alGuardar} onCancelar={cerrar} onOcupado={setOcupado} />
                 </Modal>
             )}
             {accion === 'combo' && (

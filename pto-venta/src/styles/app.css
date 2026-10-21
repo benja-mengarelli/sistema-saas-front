@@ -1164,6 +1164,23 @@ body {
     }
 }
 
+.venta--anulada {
+    opacity: .55;
+}
+
+.venta--anulada strong {
+    text-decoration: line-through;
+}
+
+.cc-cargo summary {
+    cursor: pointer;
+}
+
+.carrito__ventas {
+    width: 100%;
+    margin-top: .5rem;
+}
+
 /*! CUENTACORRIENTE  */
 .modo {
     display: inline-flex;
